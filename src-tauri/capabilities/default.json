@@ -11,6 +11,9 @@
     "notification:default",
     "notification:default",
     "dialog:default",
-    "http:default"
+    {
+      "identifier": "http:default",
+      "allow": [{ "url": "https://salahtime.in" }]
+    }
   ]
 }
