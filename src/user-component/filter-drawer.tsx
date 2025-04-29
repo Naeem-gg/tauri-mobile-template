@@ -41,7 +41,7 @@ export default function FilterDrawer({ open, onClose }: FilterDrawerProps) {
   const handleReset = () => {
     const reset = {
       prayer: "all",
-      timeRange: ["05:00", "22:00"],
+      timeRange: ["05:00", "22:00"] as [string, string],
       area: "all",
     }
     setLocalFilters(reset)
