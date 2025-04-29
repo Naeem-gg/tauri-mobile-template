@@ -118,3 +118,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+@font-face{
+  font-family: "jameel";
+  src:local("jameel"),
+  url('./assets/fonts/jameel.ttf') 
+}
+body{
+  font-family: "jameel";
+  /* font-size: 1.2rem;
+  line-height: 1.5rem;
+  font-weight: 400; */
+}

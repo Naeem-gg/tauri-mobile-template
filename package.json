@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "ddev":"tauri android dev",
+    "dbuild":"tauri android build"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.11",
