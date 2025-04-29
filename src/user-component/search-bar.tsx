@@ -1,14 +1,11 @@
-import { useState } from "react"
-import { Search, Sliders } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { useSearchStore } from "@/store/search-store"
 import { motion } from "framer-motion"
-import FilterDrawer from "./filter-drawer"
+import { Search } from "lucide-react"
 
 export default function SearchBar() {
   const { searchQuery, setSearchQuery } = useSearchStore()
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  
 
   return (
     <>
@@ -28,19 +25,8 @@ export default function SearchBar() {
               className="pl-9 pr-4 h-12 rounded-full border-gray-200"
             />
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-12 w-12 rounded-full border-gray-200"
-            onClick={() => setIsFilterOpen(true)}
-          >
-            <Sliders className="h-5 w-5" />
-            <span className="sr-only">Filters</span>
-          </Button>
         </div>
       </motion.div>
-
-      <FilterDrawer open={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
     </>
   )
 }

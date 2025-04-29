@@ -1,162 +1,174 @@
-import { useState } from "react"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
+// src/user-component/filters-drawer.tsx
 import { Button } from "@/components/ui/button"
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Slider } from "@/components/ui/slider"
 import { useFilterStore } from "@/store/filter-store"
 import { format } from "date-fns"
+import { Filter } from "lucide-react"
+import { useState } from "react"
 
-interface FilterDrawerProps {
-  open: boolean
-  onClose: () => void
-}
+const prayers = [
+  { value: "all", label: "All Prayers" },
+  { value: "fajr", label: "Fajr" },
+  { value: "zuhr", label: "Zuhr" },
+  { value: "asr", label: "Asr" },
+  { value: "maghrib", label: "Maghrib" },
+  { value: "isha", label: "Isha" },
+]
 
-export default function FilterDrawer({ open, onClose }: FilterDrawerProps) {
-  const { filters, setFilters, resetFilters } = useFilterStore()
+const areas = [
+  { value: "all", label: "All Areas" },
+  { value: "gulshan", label: "Gulshan" },
+  { value: "nazimabad", label: "Nazimabad" },
+  { value: "saddar", label: "Saddar" },
+  { value: "clifton", label: "Clifton" },
+  { value: "dha", label: "DHA" },
+]
+
+export default function FiltersDrawer() {
+  const { filters, setFilters } = useFilterStore()
+  
+  // Local state to manage form values
   const [localFilters, setLocalFilters] = useState(filters)
+  
+  // Convert minutes to time string (HH:MM)
+  const minutesToTimeString = (minutes: number) => {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`
+  }
 
-  const prayers = [
-    { value: "fajr", label: "Fajr", urduLabel: "فجر" },
-    { value: "zohr", label: "Zohr", urduLabel: "ظہر" },
-    { value: "asr", label: "Asr", urduLabel: "عصر" },
-    { value: "maghrib", label: "Maghrib", urduLabel: "مغرب" },
-    { value: "isha", label: "Isha", urduLabel: "عشاء" },
-    { value: "juma", label: "Juma", urduLabel: "جمعہ" },
-  ]
+  // Convert time string to minutes
+  const timeStringToMinutes = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number)
+    return hours * 60 + minutes
+  }
 
-  const areas = [
-    { value: "all", label: "All Areas" },
-    { value: "downtown", label: "Downtown / ڈاؤن ٹاؤن" },
-    { value: "central-park", label: "Central Park / سینٹرل پارک" },
-    { value: "green-valley", label: "Green Valley / گرین ویلی" },
-  ]
+  // Default time range: 4:00 AM to 10:00 PM
+  const defaultTimeRange = [240, 1320] // 4 hours and 22 hours in minutes
+  
+  // Current time range in minutes
+  const [timeRange, setTimeRange] = useState(
+    filters.timeRange 
+      ? [timeStringToMinutes(filters.timeRange[0]), timeStringToMinutes(filters.timeRange[1])]
+      : defaultTimeRange
+  )
 
-  const handleApply = () => {
+  // Handle time range change
+  const handleTimeRangeChange = (value: number[]) => {
+    setTimeRange(value)
+    setLocalFilters({
+      ...localFilters,
+      timeRange: [minutesToTimeString(value[0]), minutesToTimeString(value[1])]
+    })
+  }
+
+  // Apply filters
+  const applyFilters = () => {
     setFilters(localFilters)
-    onClose()
   }
 
-  const handleReset = () => {
-    const reset = {
+  // Reset filters
+  const resetFilters = () => {
+    const defaultFilters = {
       prayer: "all",
-      timeRange: ["05:00", "22:00"] as [string, string],
       area: "all",
+      timeRange: [minutesToTimeString(defaultTimeRange[0]), minutesToTimeString(defaultTimeRange[1])] as [string, string]
     }
-    setLocalFilters(reset)
-    resetFilters()
-  }
-
-  // Convert time range for display
-  const formatTimeRange = (time: string) => {
-    const [hours, minutes] = time.split(":")
-    const date = new Date()
-    date.setHours(Number.parseInt(hours, 10))
-    date.setMinutes(Number.parseInt(minutes, 10))
-    return format(date, "h:mm a")
+    setLocalFilters(defaultFilters)
+    setTimeRange(defaultTimeRange)
+    setFilters(defaultFilters)
   }
 
   return (
-    <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl">
-        <SheetHeader className="mb-4">
-          <SheetTitle className="text-center text-xl">Filter Masjids</SheetTitle>
-        </SheetHeader>
-
-        <div className="space-y-6 overflow-y-auto pb-20">
-          <div className="space-y-3">
-            <Label className="text-base font-medium">Prayer</Label>
-            <RadioGroup
-              value={localFilters.prayer}
-              onValueChange={(value) => setLocalFilters({ ...localFilters, prayer: value })}
-              className="grid grid-cols-3 gap-2"
-            >
-              <div className="col-span-3">
-                <div className="flex items-center space-x-2 rounded-md border p-3">
-                  <RadioGroupItem value="all" id="all" />
-                  <Label htmlFor="all" className="flex-1">
-                    All Prayers
-                  </Label>
-                </div>
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Filter size={16} />
+          <span>Filters</span>
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <div className="mx-auto w-full max-w-sm">
+          <DrawerHeader>
+            <DrawerTitle>Filter Masjids</DrawerTitle>
+          </DrawerHeader>
+          <div className="p-4 pb-0">
+            <div className="space-y-6">
+              {/* Prayer Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="prayer">Prayer</Label>
+                <Select 
+                  value={localFilters.prayer} 
+                  onValueChange={(value) => setLocalFilters({...localFilters, prayer: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select prayer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {prayers.map((prayer) => (
+                      <SelectItem key={prayer.value} value={prayer.value}>
+                        {prayer.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {prayers.map((prayer) => (
-                <div key={prayer.value} className="col-span-1">
-                  <div className="flex flex-col items-center space-y-1 rounded-md border p-3 text-center">
-                    <RadioGroupItem value={prayer.value} id={prayer.value} className="mx-auto" />
-                    <Label htmlFor={prayer.value} className="text-sm">
-                      {prayer.label}
-                    </Label>
-                    <span className="text-xs font-medium text-muted-foreground">{prayer.urduLabel}</span>
-                  </div>
+              {/* Area Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="area">Area</Label>
+                <RadioGroup 
+                  value={localFilters.area} 
+                  onValueChange={(value) => setLocalFilters({...localFilters, area: value})}
+                  className="grid grid-cols-2 gap-2"
+                >
+                  {areas.map((area) => (
+                    <div key={area.value} className="flex items-center space-x-2">
+                      <RadioGroupItem value={area.value} id={area.value} />
+                      <Label htmlFor={area.value}>{area.label}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              {/* Time Range Selection */}
+              <div className="space-y-4">
+                <Label>Prayer Time Range</Label>
+                <Slider
+                  defaultValue={timeRange}
+                  value={timeRange}
+                  min={0}
+                  max={1440}
+                  step={15}
+                  onValueChange={handleTimeRangeChange}
+                  className="py-4"
+                />
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>{format(new Date().setHours(Math.floor(timeRange[0]/60), timeRange[0]%60), 'h:mm a')}</span>
+                  <span>{format(new Date().setHours(Math.floor(timeRange[1]/60), timeRange[1]%60), 'h:mm a')}</span>
                 </div>
-              ))}
-            </RadioGroup>
-          </div>
-
-          <div className="space-y-3">
-            <Label className="text-base font-medium">Prayer Time Range</Label>
-            <div className="px-2">
-              <Slider
-                defaultValue={[5, 22]}
-                min={0}
-                max={24}
-                step={0.5}
-                onValueChange={(value) => {
-                  const [start, end] = value
-                  const startHour = Math.floor(start)
-                  const startMin = start % 1 === 0 ? "00" : "30"
-                  const endHour = Math.floor(end)
-                  const endMin = end % 1 === 0 ? "00" : "30"
-
-                  setLocalFilters({
-                    ...localFilters,
-                    timeRange: [
-                      `${startHour.toString().padStart(2, "0")}:${startMin}`,
-                      `${endHour.toString().padStart(2, "0")}:${endMin}`,
-                    ],
-                  })
-                }}
-              />
-              <div className="mt-2 flex justify-between text-sm text-muted-foreground">
-                <span>{formatTimeRange(localFilters.timeRange[0])}</span>
-                <span>{formatTimeRange(localFilters.timeRange[1])}</span>
               </div>
             </div>
           </div>
-
-          <div className="space-y-3">
-            <Label className="text-base font-medium">Area</Label>
-            <Select
-              value={localFilters.area}
-              onValueChange={(value) => setLocalFilters({ ...localFilters, area: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select area" />
-              </SelectTrigger>
-              <SelectContent>
-                {areas.map((area) => (
-                  <SelectItem key={area.value} value={area.value}>
-                    {area.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <DrawerFooter>
+            <div className="flex space-x-2">
+              <Button variant="outline" className="flex-1" onClick={resetFilters}>
+                Reset
+              </Button>
+              <Button className="flex-1" onClick={applyFilters}>
+                Apply Filters
+              </Button>
+            </div>
+            <DrawerClose asChild>
+              <Button variant="ghost">Close</Button>
+            </DrawerClose>
+          </DrawerFooter>
         </div>
-
-        <SheetFooter className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t">
-          <div className="flex w-full gap-2">
-            <Button variant="outline" className="flex-1" onClick={handleReset}>
-              Reset
-            </Button>
-            <Button className="flex-1" onClick={handleApply}>
-              Apply Filters
-            </Button>
-          </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   )
 }

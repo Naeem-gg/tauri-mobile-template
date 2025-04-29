@@ -1,5 +1,4 @@
 import MasjidList from "@/user-component/masjid-list"
-import SearchBar from "@/user-component/search-bar"
 
 
 import { createFileRoute } from '@tanstack/react-router'
@@ -12,7 +11,6 @@ function Index() {
   
   return (
     <main className="flex min-h-screen flex-col bg-gray-50">
-      <SearchBar />
       <MasjidList/>
     </main>
   )

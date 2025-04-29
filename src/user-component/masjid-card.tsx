@@ -1,128 +1,103 @@
-import { useState } from "react"
-import type { Masjid, Prayer } from "@/types/masjid"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { ChevronDown, ChevronUp, MapPin, Clock } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { format, parse } from "date-fns"
+// src/user-component/masjid-card.tsx
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import type { Masjid } from "@/types/masjid"
+import { MoreVertical, Navigation } from "lucide-react"
+import { motion } from "framer-motion"
 
 interface MasjidCardProps {
   masjid: Masjid
 }
 
 export default function MasjidCard({ masjid }: MasjidCardProps) {
-  const [expanded, setExpanded] = useState(false)
-
-  const prayers: Prayer[] = [
-    { name: "Fajr", urduName: "فجر", time: masjid.fajr },
-    { name: "Zohr", urduName: "ظہر", time: masjid.zohr },
-    { name: "Asr", urduName: "عصر", time: masjid.asr },
-    { name: "Maghrib", urduName: "مغرب", time: masjid.maghrib },
-    { name: "Isha", urduName: "عشاء", time: masjid.isha },
-    { name: "Juma", urduName: "جمعہ", time: masjid.juma },
-  ]
-
-  // Format time to 12-hour format
-  const formatTime = (time: string) => {
-    try {
-      const parsedTime = parse(time, "HH:mm", new Date())
-      return format(parsedTime, "h:mm a")
-    } catch (error) {
-      return time // Fallback to original format if parsing fails
-    }
-  }
-
-  // Find the next prayer
-  const getNextPrayer = (): Prayer | null => {
+  // Function to determine if a prayer time is current (within 30 minutes)
+  const isCurrentPrayer = (prayerTime: string) => {
     const now = new Date()
-    const currentHour = now.getHours()
-    const currentMinute = now.getMinutes()
-    const currentTimeInMinutes = currentHour * 60 + currentMinute
-
-    for (const prayer of prayers) {
-      const [prayerHour, prayerMinute] = prayer.time.split(":").map(Number)
-      const prayerTimeInMinutes = prayerHour * 60 + prayerMinute
-
-      if (prayerTimeInMinutes > currentTimeInMinutes) {
-        return prayer
-      }
-    }
-
-    return prayers[0] // Return Fajr if all prayers for today have passed
+    const [hours, minutes] = prayerTime.split(":").map(Number)
+    const prayerDate = new Date()
+    prayerDate.setHours(hours, minutes, 0)
+    
+    const diffMinutes = Math.abs(prayerDate.getTime() - now.getTime()) / 60000
+    return diffMinutes <= 30
   }
 
-  const nextPrayer = getNextPrayer()
+  // Get current prayer
+  const getCurrentPrayer = () => {
+    const prayerTimes = [
+      { name: "Fajr", time: masjid.fajr },
+      { name: "Zuhr", time: masjid.zohr },
+      { name: "Asr", time: masjid.asr },
+      { name: "Maghrib", time: masjid.maghrib },
+      { name: "Isha", time: masjid.isha }
+    ]
+    
+    return prayerTimes.find(prayer => isCurrentPrayer(prayer.time))
+  }
+  
+  const currentPrayer = getCurrentPrayer()
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-0">
-        <div className="p-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-medium text-lg">{masjid.name}</h3>
-              <h4 className="text-sm text-gray-500 font-medium">{masjid.urduName}</h4>
-              <div className="flex items-center mt-1 text-sm text-gray-500">
-                <MapPin className="h-3.5 w-3.5 mr-1" />
-                <span>
-                  {masjid.area} / {masjid.urduArea}
-                </span>
-              </div>
-            </div>
-
-            {nextPrayer && (
-              <div className="bg-green-50 px-3 py-1.5 rounded-full flex items-center">
-                <Clock className="h-3.5 w-3.5 text-green-600 mr-1" />
-                <div className="flex flex-col">
-                  <span className="text-xs font-medium text-green-600">{nextPrayer.name}</span>
-                  <span className="text-xs text-green-700">{formatTime(nextPrayer.time)}</span>
-                </div>
-              </div>
-            )}
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Card className="overflow-hidden border-0 bg-white shadow-md dark:bg-gray-900">
+        <CardHeader className="flex flex-row items-start justify-between bg-gradient-to-r from-emerald-500 to-teal-600 p-4 text-white">
+          <div>
+            <h3 className="text-xl font-bold">{masjid.name}</h3>
+            <p className="text-sm opacity-90">{masjid.area}</p>
           </div>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            {prayers.slice(0, 3).map((prayer) => (
-              <div key={prayer.name} className="bg-gray-100 px-2 py-1 rounded text-xs">
-                <span className="font-medium">{prayer.name}</span>: {formatTime(prayer.time)}
+          <div className="flex items-center space-x-2">
+            {currentPrayer && (
+              <Badge variant="secondary" className="bg-white/20 text-white hover:bg-white/30">
+                {currentPrayer.name} Soon
+              </Badge>
+            )}
+            <button className="rounded-full p-1 text-white transition-colors hover:bg-white/20">
+              <MoreVertical size={18} />
+            </button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-5 gap-2 text-center">
+            {Object.entries({
+              Fajr: masjid.fajr,
+              Zuhr: masjid.zohr,
+              Asr: masjid.asr,
+              Maghrib: masjid.maghrib,
+              Isha: masjid.isha
+            }).map(([prayer, time]) => (
+              <div 
+                key={prayer} 
+                className={`rounded p-2 ${
+                  isCurrentPrayer(time) 
+                    ? "bg-emerald-100 dark:bg-emerald-950/40" 
+                    : "bg-gray-50 dark:bg-gray-800"
+                }`}
+              >
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{prayer}</p>
+                <p className={`mt-1 font-semibold ${
+                  isCurrentPrayer(time) 
+                    ? "text-emerald-700 dark:text-emerald-400" 
+                    : "text-gray-900 dark:text-white"
+                }`}>
+                  {time}
+                </p>
               </div>
             ))}
-            {!expanded && prayers.length > 3 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="px-2 py-1 h-auto text-xs font-normal"
-                onClick={() => setExpanded(true)}
-              >
-                +{prayers.length - 3} more
-              </Button>
-            )}
           </div>
-
-          <AnimatePresence>
-            {expanded && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="mt-2"
-              >
-                <div className="grid grid-cols-2 gap-2">
-                  {prayers.slice(3).map((prayer) => (
-                    <div key={prayer.name} className="bg-gray-100 px-2 py-1 rounded text-xs">
-                      <span className="font-medium">{prayer.name}</span>: {formatTime(prayer.time)}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)} className="w-full mt-2 h-6 text-xs">
-            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+          
+          {/* Directions button */}
+          <div className="mt-3 flex justify-end">
+            <button 
+              className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              <Navigation size={14} />
+              <span>Directions</span>
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }
