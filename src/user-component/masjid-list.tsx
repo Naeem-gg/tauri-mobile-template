@@ -1,22 +1,31 @@
-import { useState, useEffect } from "react"
-import type { Masjid } from "@/types/masjid"
-import MasjidCard from "./masjid-card"
-import { useSearchStore } from "@/store/search-store"
+import { fetchMasjids } from "@/api"
 import { useFilterStore } from "@/store/filter-store"
+import { useSearchStore } from "@/store/search-store"
+import type { Masjid } from "@/types/masjid"
+import { useQuery } from "@tanstack/react-query"
+import { AnimatePresence, motion } from "framer-motion"
 import { debounce } from "lodash"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect } from "react"
+import MasjidCard from "./masjid-card"
 
-interface MasjidListProps {
-  initialMasjids: Masjid[]
-}
-
-export default function MasjidList({ initialMasjids }: MasjidListProps) {
-  const [masjids, setMasjids] = useState<Masjid[]>(initialMasjids)
+export default function MasjidList() {
+  const { 
+    data: initialMasjids = [], 
+    isLoading, 
+    error 
+  } = useQuery({ 
+    queryKey: ['masjids'], 
+    queryFn: fetchMasjids 
+  });
+  
+  const [masjids, setMasjids] = useState<Masjid[]>([]);
   const { searchQuery } = useSearchStore()
   const { filters } = useFilterStore()
 
   // Filter masjids based on search query and filters
   const filterMasjids = debounce(() => {
+    if (!initialMasjids) return;
+    
     let filtered = [...initialMasjids]
 
     // Search filter
@@ -63,6 +72,9 @@ export default function MasjidList({ initialMasjids }: MasjidListProps) {
     filterMasjids()
     return filterMasjids.cancel
   }, [searchQuery, filters, initialMasjids])
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className="flex-1 p-4">

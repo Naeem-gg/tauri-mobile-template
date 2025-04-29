@@ -8,8 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "ddev":"tauri android dev",
-    "dbuild":"tauri android build"
+    "ddev": "tauri android dev",
+    "dbuild": "tauri android build"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.11",
@@ -19,6 +19,8 @@
     "@radix-ui/react-slider": "^1.3.2",
     "@radix-ui/react-slot": "^1.2.0",
     "@tailwindcss/vite": "^4.1.4",
+    "@tanstack/react-query": "^5.74.8",
+    "@tanstack/react-query-devtools": "^5.74.9",
     "@tanstack/react-router": "^1.117.1",
     "@tanstack/react-router-devtools": "^1.117.1",
     "@tauri-apps/api": "^2",
@@ -39,6 +41,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.74.7",
     "@tanstack/router-plugin": "^1.117.2",
     "@tauri-apps/cli": "^2",
     "@types/lodash": "^4.17.16",
