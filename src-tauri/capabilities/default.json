@@ -7,13 +7,40 @@
   ],
   "permissions": [
     "core:default",
-    "opener:default",
-    "notification:default",
     "notification:default",
     "dialog:default",
     {
       "identifier": "http:default",
-      "allow": [{ "url": "https://salahtime.in" }]
+      "allow": [
+        {
+          "url": "https://salahtime.in"
+        },
+        {
+          "url": "https://api.sunrisesunset.io"
+        }
+      ]
+    },
+    "store:default",
+    "opener:default",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {"url": "https://www.facebook.com"},
+        {"url": "https://twitter.com"},
+        {"url": "https://wa.me"},
+        {"url": "https://www.snapchat.com"},
+        {"url": "https://www.instagram.com"},
+        {"url": "https://www.tiktok.com"},
+        {"url": "https://www.youtube.com"},
+        {"url": "https://www.reddit.com"},
+        {"url": "https://www.pinterest.com"},
+        {"url": "https://www.linkedin.com"},
+        {"url": "https://www.quora.com"},
+        {"url": "https://www.twitch.tv"},
+        {"url": "https://www.discord.com"},
+        {"url": "https://www.github.com"},
+        {"url": "mailto:"}
+      ]
     }
   ]
 }

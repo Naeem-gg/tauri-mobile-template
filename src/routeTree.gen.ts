@@ -11,13 +11,55 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as UpcomingImport } from './routes/upcoming'
+import { Route as NewMasjidImport } from './routes/new-masjid'
+import { Route as ImplementedFeaturesImport } from './routes/implemented-features'
+import { Route as FeedbackImport } from './routes/feedback'
+import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as MasjidRouteImport } from './routes/masjid.$route'
 
 // Create/Update Routes
+
+const UpcomingRoute = UpcomingImport.update({
+  id: '/upcoming',
+  path: '/upcoming',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NewMasjidRoute = NewMasjidImport.update({
+  id: '/new-masjid',
+  path: '/new-masjid',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ImplementedFeaturesRoute = ImplementedFeaturesImport.update({
+  id: '/implemented-features',
+  path: '/implemented-features',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FeedbackRoute = FeedbackImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AboutRoute = AboutImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MasjidRouteRoute = MasjidRouteImport.update({
+  id: '/masjid/$route',
+  path: '/masjid/$route',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -32,6 +74,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutImport
+      parentRoute: typeof rootRoute
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackImport
+      parentRoute: typeof rootRoute
+    }
+    '/implemented-features': {
+      id: '/implemented-features'
+      path: '/implemented-features'
+      fullPath: '/implemented-features'
+      preLoaderRoute: typeof ImplementedFeaturesImport
+      parentRoute: typeof rootRoute
+    }
+    '/new-masjid': {
+      id: '/new-masjid'
+      path: '/new-masjid'
+      fullPath: '/new-masjid'
+      preLoaderRoute: typeof NewMasjidImport
+      parentRoute: typeof rootRoute
+    }
+    '/upcoming': {
+      id: '/upcoming'
+      path: '/upcoming'
+      fullPath: '/upcoming'
+      preLoaderRoute: typeof UpcomingImport
+      parentRoute: typeof rootRoute
+    }
+    '/masjid/$route': {
+      id: '/masjid/$route'
+      path: '/masjid/$route'
+      fullPath: '/masjid/$route'
+      preLoaderRoute: typeof MasjidRouteImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -39,32 +123,84 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/feedback': typeof FeedbackRoute
+  '/implemented-features': typeof ImplementedFeaturesRoute
+  '/new-masjid': typeof NewMasjidRoute
+  '/upcoming': typeof UpcomingRoute
+  '/masjid/$route': typeof MasjidRouteRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/feedback': typeof FeedbackRoute
+  '/implemented-features': typeof ImplementedFeaturesRoute
+  '/new-masjid': typeof NewMasjidRoute
+  '/upcoming': typeof UpcomingRoute
+  '/masjid/$route': typeof MasjidRouteRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/feedback': typeof FeedbackRoute
+  '/implemented-features': typeof ImplementedFeaturesRoute
+  '/new-masjid': typeof NewMasjidRoute
+  '/upcoming': typeof UpcomingRoute
+  '/masjid/$route': typeof MasjidRouteRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/feedback'
+    | '/implemented-features'
+    | '/new-masjid'
+    | '/upcoming'
+    | '/masjid/$route'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/feedback'
+    | '/implemented-features'
+    | '/new-masjid'
+    | '/upcoming'
+    | '/masjid/$route'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/feedback'
+    | '/implemented-features'
+    | '/new-masjid'
+    | '/upcoming'
+    | '/masjid/$route'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  FeedbackRoute: typeof FeedbackRoute
+  ImplementedFeaturesRoute: typeof ImplementedFeaturesRoute
+  NewMasjidRoute: typeof NewMasjidRoute
+  UpcomingRoute: typeof UpcomingRoute
+  MasjidRouteRoute: typeof MasjidRouteRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  FeedbackRoute: FeedbackRoute,
+  ImplementedFeaturesRoute: ImplementedFeaturesRoute,
+  NewMasjidRoute: NewMasjidRoute,
+  UpcomingRoute: UpcomingRoute,
+  MasjidRouteRoute: MasjidRouteRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +213,35 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/about",
+        "/feedback",
+        "/implemented-features",
+        "/new-masjid",
+        "/upcoming",
+        "/masjid/$route"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/about": {
+      "filePath": "about.tsx"
+    },
+    "/feedback": {
+      "filePath": "feedback.tsx"
+    },
+    "/implemented-features": {
+      "filePath": "implemented-features.tsx"
+    },
+    "/new-masjid": {
+      "filePath": "new-masjid.tsx"
+    },
+    "/upcoming": {
+      "filePath": "upcoming.tsx"
+    },
+    "/masjid/$route": {
+      "filePath": "masjid.$route.tsx"
     }
   }
 }
